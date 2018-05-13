@@ -15,10 +15,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.hdl.myhttputils.MyHttpUtils;
 import com.hdl.myhttputils.bean.CommCallback;
 import com.sendtion.xrichtext.RichTextEditor;
+import com.wang.tripdiaryapp.bean.Group;
 import com.wang.tripdiaryapp.bean.Note;
+import com.wang.tripdiaryapp.db.GroupDao;
 import com.wang.tripdiaryapp.db.NoteDao;
 import com.wang.tripdiaryapp.util.CommonUtil;
 import com.wang.tripdiaryapp.util.ImageUtils;
@@ -26,9 +34,13 @@ import com.wang.tripdiaryapp.util.StringUtils;
 import com.wang.tripdiaryapp.util.UploadUtil;
 import com.wang.tripdiaryapp.R;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import me.iwf.photopicker.PhotoPicker;
 import rx.Observable;
@@ -41,14 +53,19 @@ import rx.schedulers.Schedulers;
 public class NewActivity extends BaseActivity implements RichTextEditor.OnDeleteImageListener{
     private static final String TAG = "NewActivity";
 
+    private static final int REQUEST_CODE_CHOOSE = 23;//定义请求码常量
+
     private EditText et_new_title;
     private RichTextEditor et_new_content;
     private TextView tv_new_time;
+    private TextView tv_new_group;
 
+    private GroupDao groupDao;
     private NoteDao noteDao;
     private Note note;//笔记对象
     private String myTitle;
     private String myContent;
+    private String myGroupName;
     private String myNoteTime;
     private int flag;//区分是新建笔记还是编辑笔记
 
@@ -61,7 +78,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
     private Subscription subsLoading;
     private Subscription subsInsert;
 
-    private static final String BASE_URL = "http://xixixi.pythonanywhere.com/tripdiary/upload/";//文件上传的接口
+    private static final String BASE_URL = "http://xixixi.pythonanywhere.com/tripdiary/upload";//文件上传的接口
     private static final String IMG_URL = "https://www.pythonanywhere.com/user/xixixi/files/home/xixixi/Trip/upload";//文件存放的路径
 
     @Override
@@ -94,6 +111,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
             }
         });
 
+        groupDao = new GroupDao(this);
         noteDao = new NoteDao(this);
         note = new Note();
 
@@ -102,9 +120,13 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
 
         insertDialog = new ProgressDialog(this);
         insertDialog.setMessage("正在插入图片...");
+        insertDialog.setCanceledOnTouchOutside(false);
+
         et_new_title = (EditText) findViewById(R.id.et_new_title);
         et_new_content = (RichTextEditor) findViewById(R.id.et_new_content);
         tv_new_time = (TextView) findViewById(R.id.tv_new_time);
+        tv_new_group = (TextView) findViewById(R.id.tv_new_group);
+
 
         Intent intent = getIntent();
         flag = intent.getIntExtra("flag", 0);//0新建，1编辑
@@ -115,13 +137,15 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
             myTitle = note.getTitle();
             myContent = note.getContent();
             myNoteTime = note.getCreateTime();
+            Group group = groupDao.queryGroupById(note.getGroupId());
+            myGroupName = group.getName();
 
             loadingDialog = new ProgressDialog(this);
             loadingDialog.setMessage("数据加载中...");
             loadingDialog.setCanceledOnTouchOutside(false);
             loadingDialog.show();
 
-            setTitle("编辑笔记");
+            setTitle("编辑日记");
             tv_new_time.setText(note.getCreateTime());
             et_new_title.setText(note.getTitle());
             et_new_content.post(new Runnable() {
@@ -133,7 +157,11 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                 }
             });
         } else {
-            setTitle("新建笔记");
+            setTitle("新的日记");
+            if (myGroupName == null || "全部笔记".equals(myGroupName)) {
+                myGroupName = "旅行日记";
+            }
+            tv_new_group.setText(myGroupName);
             myNoteTime = CommonUtil.date2string(new Date());
             tv_new_time.setText(myNoteTime);
         }
@@ -225,50 +253,67 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
      * 保存数据,=0销毁当前界面，=1不销毁界面，为了防止在后台时保存笔记并销毁，应该只保存笔记
      */
     private void saveNoteData(boolean isBackground) {
-        String noteTitle = et_new_title.getText().toString();
-        String noteContent = getEditData();
-        String noteTime = tv_new_time.getText().toString();
-        if (noteTitle.length() == 0 ){//如果标题为空，则截取内容为标题
-             if (noteContent.length() > cutTitleLength){
-                 noteTitle = noteContent.substring(0,cutTitleLength);
-             } else if (noteContent.length() > 0 && noteContent.length() <= cutTitleLength){
-                 noteTitle = noteContent;
-             }
-        }
-        //这里换成volley请求，传到后台
-        note.setTitle(noteTitle);
-        note.setContent(noteContent);
-        note.setType(2);
-        note.setBgColor("#FFFFFF");
-        note.setIsEncrypt(0);
-        note.setCreateTime(CommonUtil.date2string(new Date()));
-        if (flag == 0 ) {//新建笔记
-            if (noteTitle.length() == 0 && noteContent.length() == 0) {
-                if (!isBackground){
-                    Toast.makeText(NewActivity.this, "请输入内容", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                long noteId = noteDao.insertNote(note);
-                //Log.i("", "noteId: "+noteId);
-                //查询新建笔记id，防止重复插入
-                note.setId((int) noteId);
-                flag = 1;//插入以后只能是编辑
-                if (!isBackground){
-                    Intent intent = new Intent();
-                    setResult(RESULT_OK, intent);
-                    finish();
+        String d_title = et_new_title.getText().toString();
+        String d_content = getEditData();
+        String d_author = LoginActivity.usernameStr;
+
+        String groupName = tv_new_group.getText().toString();
+        String d_date = tv_new_time.getText().toString();
+        Group group = groupDao.queryGroupByName(myGroupName);
+
+        if(group != null){
+            if (d_title.length() == 0 ){//如果标题为空，则截取内容为标题
+                if (d_content.length() > cutTitleLength){
+                    d_title = d_content.substring(0,cutTitleLength);
+                } else if (d_content.length() > 0 && d_content.length() <= cutTitleLength){
+                    d_title = d_content;
                 }
             }
-        }else if (flag == 1) {//编辑笔记
-            if (!noteTitle.equals(myTitle) || !noteContent.equals(myContent)
-                    || !noteTime.equals(myNoteTime)) {
+            //这里换成volley请求，传到后台
+            int groupId = group.getId();
+            note.setTitle(d_title);
+            note.setAuthor(d_author);
+            note.setContent(d_content);
+            note.setGroupId(groupId);
+            note.setGroupName(groupName);
+            note.setType(2);
+            note.setBgColor("#FFFFFF");
+            note.setIsEncrypt(0);
+            note.setCreateTime(CommonUtil.date2string(new Date()));
+            if (flag == 0 ) {//新建笔记
+                if (d_title.length() == 0 && d_content.length() == 0) {
+                    if (!isBackground){
+                        Toast.makeText(NewActivity.this, "请输入内容", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    //上传笔记到服务器端
+                    uploadNote(d_title,d_author,d_content);
+
+                    long noteId = noteDao.insertNote(note);
+                    //Log.i("", "noteId: "+noteId);
+                    //查询新建笔记id，防止重复插入
+                    note.setId((int) noteId);
+                    flag = 1;//插入以后只能是编辑
+                    if (!isBackground){
+                        Intent intent = new Intent();
+                        setResult(RESULT_OK, intent);
+                        finish();
+                    }
+                }
+            }else if (flag == 1) {//编辑笔记
+                if (!d_title.equals(myTitle) || !groupName.equals(myGroupName)||
+                        !d_content.equals(myContent) || !d_date.equals(myNoteTime)) {
                     noteDao.updateNote(note);
+                    updateNote(myTitle,d_title,d_content);
                 }
-                if (!isBackground){
+                if (!isBackground) {
                     finish();
                 }
             }
+
         }
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -283,7 +328,6 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                 callGallery();
                 break;
             case R.id.action_new_save:
-                showToast("this is diary save");
                 saveNoteData(false);
                 break;
         }
@@ -338,10 +382,11 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                         Log.i("NewActivity", "###imagePath="+imagePath);
                         Bitmap bitmap = ImageUtils.getSmallBitmap(imagePath, width, height);//压缩图片
                         imagePath = UploadUtil.saveToSdCard(bitmap);//获得压缩之后的图片存储路径
+
                         //上传图片
                         uploadImage(imagePath);
                         //上传到服务器之后的图片路径
-                        imagePath=IMG_URL+"/"+ UploadUtil.getFileName(imagePath)+".png";
+                        //imagePath=IMG_URL+"/"+ UploadUtil.getFileName(imagePath)+".png";
                         Log.i("NewActivity", "###path=" + imagePath);
                         subscriber.onNext(imagePath);
                     }
@@ -382,20 +427,87 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
      */
     public void uploadImage(String imagePath) {
         MyHttpUtils.build()
-                .uploadUrl("http://xixixi.pythonanywhere.com/tripdiary/upload/")
+                .uploadUrl(BASE_URL)
                 .addFile(imagePath)
                 .onExecuteUpLoad(new CommCallback() {
                     @Override
                     public void onSucceed(Object o) {
-                        Toast.makeText(getApplicationContext(), "上传成功", Toast.LENGTH_SHORT).show();
+                        showToast("图片插入成功");
                     }
                     @Override
                     public void onFailed(Throwable throwable) {
-                        Toast.makeText(getApplicationContext(), "上传失败", Toast.LENGTH_SHORT).show();
-
+                        showToast("图片插入失败");
                     }
                 });
 
+    }
+    /**
+     * 上传笔记到服务器
+     */
+    public void uploadNote(String d_title,String d_author,String d_content){
+        //volley请求，将数据存到服务器
+        String url = "http://xixixi.pythonanywhere.com/tripdiary/savediary";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        Map<String,String> map = new HashMap<>();
+        map.put("d_title",d_title);
+        map.put("d_author",d_author);
+        map.put("d_content",d_content);
+        map.put("Content-type","application/json;charset=utf-8");
+        JSONObject paramJsonObject = new JSONObject(map);
+        JsonObjectRequest jsonrequest = new JsonObjectRequest(Request.Method.POST, url, paramJsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        //判断保存状态
+                        int status = response.optInt("status");
+                        if (status == 200) {
+                            Toast.makeText(getApplicationContext(), "保存成功", Toast.LENGTH_SHORT).show();
+                        } else if (status == 400) {
+                            Toast.makeText(getApplicationContext(), "保存失败", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        //Add the request to the queue
+        queue.add(jsonrequest);
+    }
+    /**
+     * 更新笔记到服务器
+     */
+    public void updateNote(String d_title,String d_title_new,String d_content){
+        //volley请求，将数据存到服务器
+        String url = "http://xixixi.pythonanywhere.com/tripdiary/updatediary";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        Map<String,String> map = new HashMap<>();
+        map.put("d_title",d_title);
+        map.put("d_title_new",d_title_new);
+        map.put("d_content",d_content);
+        map.put("Content-type","application/json;charset=utf-8");
+        JSONObject paramJsonObject = new JSONObject(map);
+        JsonObjectRequest jsonrequest = new JsonObjectRequest(Request.Method.POST, url, paramJsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        //判断状态
+                        int status = response.optInt("status");
+                        if (status == 200) {
+                            Toast.makeText(getApplicationContext(), "更新成功", Toast.LENGTH_SHORT).show();
+                        } else if (status == 400) {
+                            Toast.makeText(getApplicationContext(), "更新失败", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        //Add the request to the queue
+        queue.add(jsonrequest);
     }
     @Override
     protected void onResume() {
@@ -441,7 +553,8 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
     public void onDeleteImage(String imagePath) {
         boolean isOK = UploadUtil.deleteFile(imagePath);
         if (isOK){
-            showToast("删除成功："+imagePath);
+            showToast("图片删除成功");
+           // showToast("删除成功："+imagePath);
         }
     }
 

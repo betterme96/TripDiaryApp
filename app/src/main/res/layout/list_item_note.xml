@@ -50,11 +50,11 @@
                 android:textSize="@dimen/text_size_14" />
 
             <TextView
-                android:id="@+id/tv_list_group"
+                android:id="@+id/tv_list_author"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:text="分类"
+                android:text="作者"
                 android:textColor="@color/grey_400"
                 android:textSize="@dimen/text_size_14" />
         </RelativeLayout>

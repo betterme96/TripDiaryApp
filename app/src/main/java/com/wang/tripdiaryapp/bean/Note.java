@@ -14,6 +14,7 @@ public class Note implements Serializable {
     private int id;//笔记ID
     private String title;//笔记标题
     private String content;//笔记内容
+    private String author;//笔记作者
     private int groupId;//分类ID
     private String groupName;//分类名称
     private int type;//笔记类型，1纯文本，2Html，3Markdown
@@ -38,6 +39,13 @@ public class Note implements Serializable {
         this.title = title;
     }
 
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
     public String getContent() {
         return content;
     }

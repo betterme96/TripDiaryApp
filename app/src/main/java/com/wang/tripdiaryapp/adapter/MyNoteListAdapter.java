@@ -105,10 +105,11 @@ public class MyNoteListAdapter extends RecyclerView.Adapter<MyNoteListAdapter.Vi
 
     //自定义的ViewHolder，持有每个Item的的所有界面元素
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView tv_list_title;//笔记标题
-        public TextView tv_list_summary;//笔记摘要
+        public TextView tv_list_title;//日记标题
+        public TextView tv_list_summary;//日记摘要
         public TextView tv_list_time;//创建时间
         public TextView tv_list_group;//笔记分类
+        public TextView tv_list_author;//日记作者
         public CardView card_view_note;
 
         public ViewHolder(View view){
@@ -117,7 +118,8 @@ public class MyNoteListAdapter extends RecyclerView.Adapter<MyNoteListAdapter.Vi
             tv_list_title = (TextView) view.findViewById(R.id.tv_list_title);
             tv_list_summary = (TextView) view.findViewById(R.id.tv_list_summary);
             tv_list_time = (TextView) view.findViewById(R.id.tv_list_time);
-            tv_list_group = (TextView) view.findViewById(R.id.tv_list_group);
+           // tv_list_group = (TextView) view.findViewById(R.id.tv_list_group);
+            tv_list_author = (TextView)view.findViewById(R.id.tv_list_author);
         }
     }
 }

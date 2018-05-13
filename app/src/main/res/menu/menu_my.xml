@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.sendtion.xrichtextdemo.ui.activity.NoteActivity">
+    tools:context="com.sendtion.xrichtextdemo.ui.activity.MyNoteActivity">
 
     <item
         android:id="@+id/action_note_share"
@@ -11,8 +11,8 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_note_credit"
+        android:id="@+id/action_note_edit"
         android:orderInCategory="100"
-        android:title="评论"
+        android:title="编辑"
         app:showAsAction="always" />
 </menu>

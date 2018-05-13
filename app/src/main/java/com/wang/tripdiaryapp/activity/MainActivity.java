@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+
     //定义一个选中一个item后的处理
     public void setChioceItem(int index){
         //重置选项+隐藏所有Fragment

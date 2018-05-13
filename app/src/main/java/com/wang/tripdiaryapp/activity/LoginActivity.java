@@ -27,6 +27,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Button register;
     private Button login;
 
+    public static String usernameStr,passwordStr;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,8 +81,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void login() {
-        final String usernameStr = username.getText().toString().trim();
-        final String passwordStr = password.getText().toString().trim();
+        usernameStr = username.getText().toString().trim();
+        passwordStr = password.getText().toString().trim();
         String url = "http://xixixi.pythonanywhere.com/tripdiary/login";
 
         RequestQueue queue = Volley.newRequestQueue(this);

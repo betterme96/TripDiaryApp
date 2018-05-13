@@ -6,13 +6,26 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.wang.tripdiaryapp.activity.LoginActivity;
 import com.wang.tripdiaryapp.bean.Note;
+import com.wang.tripdiaryapp.fragment.MyFragment;
 import com.wang.tripdiaryapp.util.CommonUtil;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 作者：Sendtion on 2016/10/24 0024 15:53
@@ -23,6 +36,7 @@ import java.util.List;
 
 public class NoteDao {
     private MyOpenHelper helper;
+
 
     public NoteDao(Context context) {
         helper = new MyOpenHelper(context);
@@ -110,6 +124,7 @@ public class NoteDao {
         }
         return ret;
     }
+
 
     /**
      * 更新笔记
