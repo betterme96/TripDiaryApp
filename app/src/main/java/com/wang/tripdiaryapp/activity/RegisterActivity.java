@@ -82,7 +82,7 @@ private void register(){
                     int status = response.optInt("status");
                     if (status == 200) {
                         Toast.makeText(getApplicationContext(), "注册成功", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                         startActivity(intent);
                     } else if (status == 400) {
                         Toast.makeText(getApplicationContext(), "注册失败", Toast.LENGTH_SHORT).show();

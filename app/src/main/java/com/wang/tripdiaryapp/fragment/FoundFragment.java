@@ -12,7 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.wang.tripdiaryapp.R;
+import com.wang.tripdiaryapp.activity.LoginActivity;
+import com.wang.tripdiaryapp.activity.MainActivity;
 import com.wang.tripdiaryapp.activity.MyNoteActivity;
 import com.wang.tripdiaryapp.activity.OtherActivity;
 import com.wang.tripdiaryapp.adapter.MyNoteListAdapter;
@@ -20,7 +28,12 @@ import com.wang.tripdiaryapp.bean.Note;
 import com.wang.tripdiaryapp.db.NoteDao;
 import com.wang.tripdiaryapp.view.SpacesItemDecoration;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FoundFragment extends Fragment {
     private static final String TAG="MyFragment";

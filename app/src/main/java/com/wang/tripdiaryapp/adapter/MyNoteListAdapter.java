@@ -118,8 +118,8 @@ public class MyNoteListAdapter extends RecyclerView.Adapter<MyNoteListAdapter.Vi
             tv_list_title = (TextView) view.findViewById(R.id.tv_list_title);
             tv_list_summary = (TextView) view.findViewById(R.id.tv_list_summary);
             tv_list_time = (TextView) view.findViewById(R.id.tv_list_time);
-           // tv_list_group = (TextView) view.findViewById(R.id.tv_list_group);
-            tv_list_author = (TextView)view.findViewById(R.id.tv_list_author);
+            tv_list_group = (TextView) view.findViewById(R.id.tv_list_group);
+           // tv_list_author = (TextView)view.findViewById(R.id.tv_list_author);
         }
     }
 }

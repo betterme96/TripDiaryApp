@@ -36,7 +36,7 @@ public class MyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater,ViewGroup container,
                              Bundle savedInstanceState){
         view = inflater.inflate(R.layout.fragment_my,container,false);
-        initView();
+        //initView();
         return view;
     }
 
@@ -50,9 +50,12 @@ public class MyFragment extends Fragment {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);//竖向列表
         rv_list_main.setLayoutManager(layoutManager);
 
+        //设置RecyclerView的适配器
         mNoteListAdapter = new MyNoteListAdapter();
-        mNoteListAdapter.setmNotes(noteList);
         rv_list_main.setAdapter(mNoteListAdapter);
+
+        mNoteListAdapter.setmNotes(noteList);
+
 
         mNoteListAdapter.setOnItemClickListener(new MyNoteListAdapter.OnRecyclerViewItemClickListener() {
             @Override
@@ -101,7 +104,7 @@ public class MyFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        refreshNoteList();
+       // refreshNoteList();
     }
 
     @Override

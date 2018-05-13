@@ -145,7 +145,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
             loadingDialog.setCanceledOnTouchOutside(false);
             loadingDialog.show();
 
-            setTitle("编辑日记");
+            setTitle("编辑笔记");
             tv_new_time.setText(note.getCreateTime());
             et_new_title.setText(note.getTitle());
             et_new_content.post(new Runnable() {
@@ -157,9 +157,9 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                 }
             });
         } else {
-            setTitle("新的日记");
+            setTitle("新建笔记");
             if (myGroupName == null || "全部笔记".equals(myGroupName)) {
-                myGroupName = "旅行日记";
+                myGroupName = "默认笔记";
             }
             tv_new_group.setText(myGroupName);
             myNoteTime = CommonUtil.date2string(new Date());
@@ -304,7 +304,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                 if (!d_title.equals(myTitle) || !groupName.equals(myGroupName)||
                         !d_content.equals(myContent) || !d_date.equals(myNoteTime)) {
                     noteDao.updateNote(note);
-                    updateNote(myTitle,d_title,d_content);
+
                 }
                 if (!isBackground) {
                     finish();
@@ -390,6 +390,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                         Log.i("NewActivity", "###path=" + imagePath);
                         subscriber.onNext(imagePath);
                     }
+                    //subscriber.onNext("http://p695w3yko.bkt.clouddn.com/18-5-5/30271511.jpg");
                     subscriber.onCompleted();
                 }catch (Exception e){
                     e.printStackTrace();
@@ -458,7 +459,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        //判断保存状态
+                        //判断状态
                         int status = response.optInt("status");
                         if (status == 200) {
                             Toast.makeText(getApplicationContext(), "保存成功", Toast.LENGTH_SHORT).show();
@@ -478,13 +479,13 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
     /**
      * 更新笔记到服务器
      */
-    public void updateNote(String d_title,String d_title_new,String d_content){
+    public void updateNote(String d_title,String d_author,String d_content){
         //volley请求，将数据存到服务器
         String url = "http://xixixi.pythonanywhere.com/tripdiary/updatediary";
         RequestQueue queue = Volley.newRequestQueue(this);
         Map<String,String> map = new HashMap<>();
         map.put("d_title",d_title);
-        map.put("d_title_new",d_title_new);
+        map.put("d_author",d_author);
         map.put("d_content",d_content);
         map.put("Content-type","application/json;charset=utf-8");
         JSONObject paramJsonObject = new JSONObject(map);
@@ -492,12 +493,12 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        //判断状态
+                        //判断注册状态
                         int status = response.optInt("status");
                         if (status == 200) {
-                            Toast.makeText(getApplicationContext(), "更新成功", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "保存成功", Toast.LENGTH_SHORT).show();
                         } else if (status == 400) {
-                            Toast.makeText(getApplicationContext(), "更新失败", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "保存失败", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -553,8 +554,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
     public void onDeleteImage(String imagePath) {
         boolean isOK = UploadUtil.deleteFile(imagePath);
         if (isOK){
-            showToast("图片删除成功");
-           // showToast("删除成功："+imagePath);
+            showToast("删除成功："+imagePath);
         }
     }
 
