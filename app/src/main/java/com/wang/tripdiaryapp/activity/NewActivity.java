@@ -288,7 +288,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                 } else {
                     //上传笔记到服务器端
                     uploadNote(d_title,d_author,d_content);
-
+                   // Toast.makeText(NewActivity.this, note.getAuthor(), Toast.LENGTH_SHORT).show();
                     long noteId = noteDao.insertNote(note);
                     //Log.i("", "noteId: "+noteId);
                     //查询新建笔记id，防止重复插入
@@ -304,6 +304,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                 if (!d_title.equals(myTitle) || !groupName.equals(myGroupName)||
                         !d_content.equals(myContent) || !d_date.equals(myNoteTime)) {
                     noteDao.updateNote(note);
+                    updateNote(myTitle,d_title,d_content);
 
                 }
                 if (!isBackground) {
@@ -321,6 +322,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
         return true;
     }
 
+    //toolbar选项
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
@@ -463,6 +465,8 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                         int status = response.optInt("status");
                         if (status == 200) {
                             Toast.makeText(getApplicationContext(), "保存成功", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(NewActivity.this, MainActivity.class);
+                            startActivity(intent);
                         } else if (status == 400) {
                             Toast.makeText(getApplicationContext(), "保存失败", Toast.LENGTH_SHORT).show();
                         }
@@ -479,13 +483,13 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
     /**
      * 更新笔记到服务器
      */
-    public void updateNote(String d_title,String d_author,String d_content){
+    public void updateNote(String d_title,String d_title_new,String d_content){
         //volley请求，将数据存到服务器
         String url = "http://xixixi.pythonanywhere.com/tripdiary/updatediary";
         RequestQueue queue = Volley.newRequestQueue(this);
         Map<String,String> map = new HashMap<>();
         map.put("d_title",d_title);
-        map.put("d_author",d_author);
+        map.put("d_title_new",d_title_new);
         map.put("d_content",d_content);
         map.put("Content-type","application/json;charset=utf-8");
         JSONObject paramJsonObject = new JSONObject(map);

@@ -14,14 +14,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.wang.tripdiaryapp.R;
+import com.wang.tripdiaryapp.activity.LoginActivity;
+import com.wang.tripdiaryapp.activity.MainActivity;
 import com.wang.tripdiaryapp.activity.MyNoteActivity;
+import com.wang.tripdiaryapp.activity.NewActivity;
+import com.wang.tripdiaryapp.activity.OtherActivity;
 import com.wang.tripdiaryapp.adapter.MyNoteListAdapter;
 import com.wang.tripdiaryapp.bean.Note;
 import com.wang.tripdiaryapp.db.NoteDao;
 import com.wang.tripdiaryapp.view.SpacesItemDecoration;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MyFragment extends Fragment {
     private static final String TAG="MyFragment";
@@ -36,7 +52,8 @@ public class MyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater,ViewGroup container,
                              Bundle savedInstanceState){
         view = inflater.inflate(R.layout.fragment_my,container,false);
-        //initView();
+
+        initView();
         return view;
     }
 
@@ -79,14 +96,15 @@ public class MyFragment extends Fragment {
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        int ret = noteDao.deleteNote(note.getId());
-                        if (ret > 0){
-                            Toast.makeText(getActivity().getApplicationContext(), "删除成功",
-                                    Toast.LENGTH_LONG).show();
+                       // int ret = noteDao.deleteNote(note.getId());
+                        deleteNote(note.getTitle());
+                        refreshNoteList();
+                        /*if (ret > 0){
+                            Toast.makeText(getActivity(), "删除成功", Toast.LENGTH_SHORT).show();
                             //TODO 删除笔记成功后，记得删除图片（分为本地图片和网络图片）
                             //获取笔记中图片的列表 StringUtils.getTextFromHtml(note.getContent(), true);
                             refreshNoteList();
-                        }
+                        }*/
                     }
                 });
                 builder.setNegativeButton("取消", null);
@@ -97,14 +115,89 @@ public class MyFragment extends Fragment {
     //刷新笔记列表
     private void refreshNoteList(){
         noteList = noteDao.queryNotesAll(groupId);
-        mNoteListAdapter.setmNotes(noteList);
-        mNoteListAdapter.notifyDataSetChanged();
+        noteList = new ArrayList<>();
+        String url = "http://xixixi.pythonanywhere.com/tripdiary/userdiary";
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
+        Map<String,String> map = new HashMap<>();
+        map.put("username", LoginActivity.usernameStr);
+        map.put("Content-type","application/json;charset=utf-8");
+        JSONObject paramJsonObject = new JSONObject(map);
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, paramJsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        if(response!=null&&response.length()>0){
+                            JSONArray diary = response.optJSONArray("diary");
+                            String dataString = diary.toString();
+
+                            for(int i=0;i<diary.length();i++){
+                                JSONObject jsonData = diary.optJSONObject(i);
+                                Note data = new Note();
+                                data.setId(jsonData.optInt("id"));
+                                //Log.i("id", "###id="+data.getId());
+                                data.setTitle(jsonData.optString("title"));
+                                data.setContent(jsonData.optString("content"));
+                                data.setGroupId(groupId);
+                                data.setGroupName(groupName);
+                                data.setType(2);
+                                data.setBgColor("#FFFFFF");
+                                data.setIsEncrypt(0);
+                                data.setCreateTime(jsonData.optString("date"));
+                                data.setUpdateTime(jsonData.optString("date"));
+                                data.setAuthor(jsonData.optString("author"));
+                                noteList.add(data);
+                            }
+                            mNoteListAdapter.setmNotes(noteList);
+                            mNoteListAdapter.notifyDataSetChanged();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        //Add the request to the queue
+        queue.add(request);
+    }
+    //删除笔记
+    private void deleteNote(String title){
+
+        String url = "http://xixixi.pythonanywhere.com/tripdiary/deletediary";
+
+        Toast.makeText(getActivity(), url, Toast.LENGTH_SHORT).show();
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
+        Map<String,String> map = new HashMap<>();
+        map.put("title",title);
+        map.put("Content-type","application/json;charset=utf-8");
+        JSONObject paramJsonObject = new JSONObject(map);
+        JsonObjectRequest jsonrequest = new JsonObjectRequest(Request.Method.POST, url, paramJsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        //判断登陆状态
+                        int status = response.optInt("status");
+                        if (status == 200) {
+                            Toast.makeText(getActivity(), "删除成功", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getActivity(), "删除失败", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //Add the request to the queue
+        queue.add(jsonrequest);
     }
     @Override
     public void onResume() {
         super.onResume();
-
-       // refreshNoteList();
+        refreshNoteList();
     }
 
     @Override
