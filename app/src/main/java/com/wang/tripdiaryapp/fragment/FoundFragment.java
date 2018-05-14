@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,9 +46,9 @@ import java.util.Map;
 public class FoundFragment extends Fragment {
     private static final String TAG="FoundFragment";
     private RecyclerView rv_list_main;
+    private SearchView searchView;
     private MyNoteListAdapter mNoteListAdapter;
     private List<Note> noteList;
-    private NoteDao noteDao;
     private Note note;
     private int groupId =0;//分类ID
     private String groupName ="默认笔记";
@@ -62,7 +63,6 @@ public class FoundFragment extends Fragment {
     }
 
     private void initView() {
-        noteDao = new NoteDao(getActivity());
         rv_list_main = view.findViewById(R.id.rv_list_main);
 
         rv_list_main.addItemDecoration(new SpacesItemDecoration(0));//设置item间距
@@ -92,7 +92,7 @@ public class FoundFragment extends Fragment {
     }
     //刷新笔记列表
     private void refreshNoteList(){
-       // noteList = noteDao.queryNotesAll(groupId);
+        //noteList = noteDao.queryNotesAll(groupId);
         noteList = new ArrayList<>();
         String url = "http://xixixi.pythonanywhere.com/tripdiary/alldiary";
         RequestQueue queue = Volley.newRequestQueue(getActivity());
@@ -110,20 +110,20 @@ public class FoundFragment extends Fragment {
 
                             for(int i=0;i<diary.length();i++){
                                 JSONObject jsonData = diary.optJSONObject(i);
-                                Note data = new Note();
-                                data.setId(jsonData.optInt("id"));
+                                note = new Note();
+                                note.setId(jsonData.optInt("id"));
                                 //Log.i("id", "###id="+data.getId());
-                                data.setTitle(jsonData.optString("title"));
-                                data.setContent(jsonData.optString("content"));
-                                data.setGroupId(groupId);
-                                data.setGroupName(groupName);
-                                data.setType(2);
-                                data.setBgColor("#FFFFFF");
-                                data.setIsEncrypt(0);
-                                data.setCreateTime(jsonData.optString("date"));
-                                data.setUpdateTime(jsonData.optString("date"));
-                                data.setAuthor(jsonData.optString("author"));
-                                noteList.add(data);
+                                note.setTitle(jsonData.optString("title"));
+                                note.setContent(jsonData.optString("content"));
+                                note.setGroupId(groupId);
+                                note.setGroupName(groupName);
+                                note.setType(2);
+                                note.setBgColor("#FFFFFF");
+                                note.setIsEncrypt(0);
+                                note.setCreateTime(jsonData.optString("date"));
+                                note.setUpdateTime(jsonData.optString("date"));
+                                note.setAuthor(jsonData.optString("author"));
+                                noteList.add(note);
                             }
                             mNoteListAdapter.setmNotes(noteList);
                             mNoteListAdapter.notifyDataSetChanged();

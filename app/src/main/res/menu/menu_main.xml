@@ -7,4 +7,9 @@
         android:orderInCategory="100"
         android:title="新建"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_account"
+        android:orderInCategory="100"
+        android:title="退出"
+        app:showAsAction="always" />
 </menu>

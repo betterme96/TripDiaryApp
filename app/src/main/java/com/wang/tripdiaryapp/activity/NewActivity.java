@@ -58,9 +58,8 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
     private EditText et_new_title;
     private RichTextEditor et_new_content;
     private TextView tv_new_time;
-    private TextView tv_new_group;
+    private TextView tv_new_author;
 
-    private GroupDao groupDao;
     private NoteDao noteDao;
     private Note note;//笔记对象
     private String myTitle;
@@ -111,7 +110,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
             }
         });
 
-        groupDao = new GroupDao(this);
+
         noteDao = new NoteDao(this);
         note = new Note();
 
@@ -125,7 +124,6 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
         et_new_title = (EditText) findViewById(R.id.et_new_title);
         et_new_content = (RichTextEditor) findViewById(R.id.et_new_content);
         tv_new_time = (TextView) findViewById(R.id.tv_new_time);
-        tv_new_group = (TextView) findViewById(R.id.tv_new_group);
 
 
         Intent intent = getIntent();
@@ -137,8 +135,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
             myTitle = note.getTitle();
             myContent = note.getContent();
             myNoteTime = note.getCreateTime();
-            Group group = groupDao.queryGroupById(note.getGroupId());
-            myGroupName = group.getName();
+
 
             loadingDialog = new ProgressDialog(this);
             loadingDialog.setMessage("数据加载中...");
@@ -158,10 +155,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
             });
         } else {
             setTitle("新建笔记");
-            if (myGroupName == null || "全部笔记".equals(myGroupName)) {
-                myGroupName = "默认笔记";
-            }
-            tv_new_group.setText(myGroupName);
+           // tv_new_author.setText(LoginActivity.usernameStr);
             myNoteTime = CommonUtil.date2string(new Date());
             tv_new_time.setText(myNoteTime);
         }
@@ -257,64 +251,48 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
         String d_content = getEditData();
         String d_author = LoginActivity.usernameStr;
 
-        String groupName = tv_new_group.getText().toString();
         String d_date = tv_new_time.getText().toString();
-        Group group = groupDao.queryGroupByName(myGroupName);
+        Toast.makeText(NewActivity.this, d_date, Toast.LENGTH_SHORT).show();
 
-        if(group != null){
-            if (d_title.length() == 0 ){//如果标题为空，则截取内容为标题
-                if (d_content.length() > cutTitleLength){
-                    d_title = d_content.substring(0,cutTitleLength);
-                } else if (d_content.length() > 0 && d_content.length() <= cutTitleLength){
-                    d_title = d_content;
+        if (d_title.length() == 0 ){//如果标题为空，则截取内容为标题
+             if (d_content.length() > cutTitleLength){
+                 d_title = d_content.substring(0,cutTitleLength);
+             } else if (d_content.length() > 0 && d_content.length() <= cutTitleLength){
+                 d_title = d_content;
+             }
+        }
+        //这里换成volley请求，传到后台
+        note.setType(2);
+        note.setBgColor("#FFFFFF");
+        note.setIsEncrypt(0);
+        note.setCreateTime(CommonUtil.date2string(new Date()));
+        if (flag == 0 ) {//新建笔记
+            if (d_title.length() == 0 && d_content.length() == 0) {
+                if (!isBackground){
+                    Toast.makeText(NewActivity.this, "请输入内容", Toast.LENGTH_SHORT).show();
                 }
-            }
-            //这里换成volley请求，传到后台
-            int groupId = group.getId();
-            note.setTitle(d_title);
-            note.setAuthor(d_author);
-            note.setContent(d_content);
-            note.setGroupId(groupId);
-            note.setGroupName(groupName);
-            note.setType(2);
-            note.setBgColor("#FFFFFF");
-            note.setIsEncrypt(0);
-            note.setCreateTime(CommonUtil.date2string(new Date()));
-            if (flag == 0 ) {//新建笔记
-                if (d_title.length() == 0 && d_content.length() == 0) {
-                    if (!isBackground){
-                        Toast.makeText(NewActivity.this, "请输入内容", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    //上传笔记到服务器端
-                    uploadNote(d_title,d_author,d_content);
-                   // Toast.makeText(NewActivity.this, note.getAuthor(), Toast.LENGTH_SHORT).show();
-                    long noteId = noteDao.insertNote(note);
-                    //Log.i("", "noteId: "+noteId);
-                    //查询新建笔记id，防止重复插入
-                    note.setId((int) noteId);
-                    flag = 1;//插入以后只能是编辑
-                    if (!isBackground){
-                        Intent intent = new Intent();
-                        setResult(RESULT_OK, intent);
-                        finish();
-                    }
-                }
-            }else if (flag == 1) {//编辑笔记
-                if (!d_title.equals(myTitle) || !groupName.equals(myGroupName)||
-                        !d_content.equals(myContent) || !d_date.equals(myNoteTime)) {
-                    noteDao.updateNote(note);
-                    updateNote(myTitle,d_title,d_content);
-
-                }
-                if (!isBackground) {
+            } else {
+                //上传笔记到服务器端
+                uploadNote(d_title,d_author,d_content,d_date);
+                flag = 1;//插入以后只能是编辑
+                if (!isBackground){
+                    Intent intent = new Intent();
+                    setResult(RESULT_OK, intent);
                     finish();
                 }
             }
+        }else if (flag == 1) {//编辑笔记
+            if (!d_title.equals(myTitle) ||!d_content.equals(myContent) || !d_date.equals(myNoteTime)) {
+                updateNote(myTitle,d_title,d_content);
 
+            }
+            if (!isBackground) {
+                finish();
+            }
         }
 
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -447,7 +425,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
     /**
      * 上传笔记到服务器
      */
-    public void uploadNote(String d_title,String d_author,String d_content){
+    public void uploadNote(String d_title,String d_author,String d_content,String d_date){
         //volley请求，将数据存到服务器
         String url = "http://xixixi.pythonanywhere.com/tripdiary/savediary";
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -455,6 +433,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
         map.put("d_title",d_title);
         map.put("d_author",d_author);
         map.put("d_content",d_content);
+        map.put("d_date",d_date);
         map.put("Content-type","application/json;charset=utf-8");
         JSONObject paramJsonObject = new JSONObject(map);
         JsonObjectRequest jsonrequest = new JsonObjectRequest(Request.Method.POST, url, paramJsonObject,

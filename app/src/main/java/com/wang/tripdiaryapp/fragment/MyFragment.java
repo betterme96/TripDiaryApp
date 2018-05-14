@@ -163,10 +163,8 @@ public class MyFragment extends Fragment {
     }
     //删除笔记
     private void deleteNote(String title){
-
         String url = "http://xixixi.pythonanywhere.com/tripdiary/deletediary";
 
-        Toast.makeText(getActivity(), url, Toast.LENGTH_SHORT).show();
         RequestQueue queue = Volley.newRequestQueue(getActivity());
         Map<String,String> map = new HashMap<>();
         map.put("title",title);
@@ -176,11 +174,11 @@ public class MyFragment extends Fragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        //判断登陆状态
+                        //判断状态
                         int status = response.optInt("status");
                         if (status == 200) {
                             Toast.makeText(getActivity(), "删除成功", Toast.LENGTH_SHORT).show();
-                        } else {
+                        } else if(status==500){
                             Toast.makeText(getActivity(), "删除失败", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -190,9 +188,9 @@ public class MyFragment extends Fragment {
                 Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_SHORT).show();
             }
         });
-
         //Add the request to the queue
         queue.add(jsonrequest);
+
     }
     @Override
     public void onResume() {

@@ -106,9 +106,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch (item.getItemId()) {
             case R.id.action_new_note:
-                Intent intent = new Intent(MainActivity.this, NewActivity.class);
+                intent = new Intent(MainActivity.this, NewActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.action_account:
+                intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
                 break;
         }

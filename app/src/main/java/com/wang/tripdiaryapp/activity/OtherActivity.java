@@ -42,9 +42,7 @@ public class OtherActivity extends  BaseActivity {
     private Note note;//笔记对象
     private String myTitle;
     private String myContent;
-    private String myGroupName;
-    private NoteDao noteDao;
-    private GroupDao groupDao;
+
 
     private ProgressDialog loadingDialog;
     private Subscription subsLoading;
@@ -79,8 +77,7 @@ public class OtherActivity extends  BaseActivity {
             }
         });
 
-        noteDao = new NoteDao(this);
-        groupDao = new GroupDao(this);
+
 
         loadingDialog = new ProgressDialog(this);
         loadingDialog.setMessage("数据加载中...");
@@ -91,7 +88,7 @@ public class OtherActivity extends  BaseActivity {
         tv_note_title.setTextIsSelectable(true);
         tv_note_content = (RichTextView) findViewById(R.id.tv_note_content);//内容
         tv_note_time = (TextView) findViewById(R.id.tv_note_time);
-        tv_note_group = (TextView) findViewById(R.id.tv_note_group);
+
 
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra("data");
@@ -99,8 +96,7 @@ public class OtherActivity extends  BaseActivity {
 
         myTitle = note.getTitle();
         myContent = note.getContent();
-        Group group = groupDao.queryGroupById(note.getGroupId());
-        myGroupName = group.getName();
+
 
         tv_note_title.setText(myTitle);
         tv_note_content.post(new Runnable() {
@@ -112,7 +108,7 @@ public class OtherActivity extends  BaseActivity {
             }
         });
         tv_note_time.setText(note.getCreateTime());
-        tv_note_group.setText(myGroupName);
+
         setTitle("日记详情");
 
     }
@@ -190,15 +186,14 @@ public class OtherActivity extends  BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            /*case R.id.action_note_credit://评论笔记
+            case R.id.action_note_credit://评论笔记
                 Intent intent = new Intent(OtherActivity.this, NewActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("note", note);
                 intent.putExtra("data", bundle);
-                intent.putExtra("flag", 1);//编辑笔记
                 startActivity(intent);
                 finish();
-                break;*/
+                break;
             case R.id.action_note_share://分享笔记
                 CommonUtil.shareTextAndImage(this, note.getTitle(), note.getContent(), null);//分享图文
                 break;

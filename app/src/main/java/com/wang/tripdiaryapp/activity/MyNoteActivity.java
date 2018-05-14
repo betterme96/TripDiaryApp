@@ -42,9 +42,7 @@ public class MyNoteActivity extends  BaseActivity {
     private Note note;//笔记对象
     private String myTitle;
     private String myContent;
-    private String myGroupName;
-    private NoteDao noteDao;
-    private GroupDao groupDao;
+
 
     private ProgressDialog loadingDialog;
     private Subscription subsLoading;
@@ -79,9 +77,6 @@ public class MyNoteActivity extends  BaseActivity {
             }
         });
 
-        noteDao = new NoteDao(this);
-        groupDao = new GroupDao(this);
-
         loadingDialog = new ProgressDialog(this);
         loadingDialog.setMessage("数据加载中...");
         loadingDialog.setCanceledOnTouchOutside(false);
@@ -91,7 +86,7 @@ public class MyNoteActivity extends  BaseActivity {
         tv_note_title.setTextIsSelectable(true);
         tv_note_content = (RichTextView) findViewById(R.id.tv_note_content);//内容
         tv_note_time = (TextView) findViewById(R.id.tv_note_time);
-        tv_note_group = (TextView) findViewById(R.id.tv_note_group);
+
 
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra("data");
@@ -99,8 +94,7 @@ public class MyNoteActivity extends  BaseActivity {
 
         myTitle = note.getTitle();
         myContent = note.getContent();
-        Group group = groupDao.queryGroupById(note.getGroupId());
-        myGroupName = group.getName();
+
 
         tv_note_title.setText(myTitle);
         tv_note_content.post(new Runnable() {
@@ -112,7 +106,7 @@ public class MyNoteActivity extends  BaseActivity {
             }
         });
         tv_note_time.setText(note.getCreateTime());
-        tv_note_group.setText(myGroupName);
+
         setTitle("日记详情");
 
     }
