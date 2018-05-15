@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         fManager = getSupportFragmentManager();
         initViews();
+
     }
     //完成组件初始化
     public void initViews(){
@@ -96,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Toolbar toolbar = findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
+
+
     }
 
     @Override
@@ -152,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     // 如果MessageFragment不为空，则直接将它显示出来
                     transaction.show(foundFragment);
+
                 }
                 break;
 

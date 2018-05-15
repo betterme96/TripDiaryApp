@@ -2,9 +2,12 @@ package com.wang.tripdiaryapp.fragment;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,8 +50,12 @@ public class FoundFragment extends Fragment {
     private static final String TAG="FoundFragment";
     private RecyclerView rv_list_main;
     private SearchView searchView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;//用于下拉刷新
     private MyNoteListAdapter mNoteListAdapter;
+    private MyNoteListAdapter findListAdapter;
     private List<Note> noteList;
+    private List<Note> findList;
+    private List<String> nameList;
     private Note note;
     private int groupId =0;//分类ID
     private String groupName ="默认笔记";
@@ -56,15 +63,47 @@ public class FoundFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,
                              Bundle savedInstanceState){
-        view = inflater.inflate(R.layout.fragment_my,container,false);
+        view = inflater.inflate(R.layout.fragment_found,container,false);
 
         initView();
         return view;
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        initListener();
+    }
+    private void initListener() {
+        //下拉刷新
+        mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipelayout);
+        //设置 进度条的颜色变化，最多可以设置4种颜色
+        mSwipeRefreshLayout.setColorSchemeColors(Color.parseColor("#d3d3d3"),Color.parseColor("#3F51B5"));
+        initPullRefresh();
+    }
+
+    private void initPullRefresh() {
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshNoteList();
+                        //刷新完成
+                        mSwipeRefreshLayout.setRefreshing(false);
+                        Toast.makeText(getActivity(), "加载完成~", Toast.LENGTH_SHORT).show();
+                    }
+
+                }, 3000);
+
+            }
+        });
+    }
+
     private void initView() {
         rv_list_main = view.findViewById(R.id.rv_list_main);
-
+        searchView = view.findViewById(R.id.searchEdit);
         rv_list_main.addItemDecoration(new SpacesItemDecoration(0));//设置item间距
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getActivity());
@@ -92,7 +131,6 @@ public class FoundFragment extends Fragment {
     }
     //刷新笔记列表
     private void refreshNoteList(){
-        //noteList = noteDao.queryNotesAll(groupId);
         noteList = new ArrayList<>();
         String url = "http://xixixi.pythonanywhere.com/tripdiary/alldiary";
         RequestQueue queue = Volley.newRequestQueue(getActivity());
@@ -112,7 +150,7 @@ public class FoundFragment extends Fragment {
                                 JSONObject jsonData = diary.optJSONObject(i);
                                 note = new Note();
                                 note.setId(jsonData.optInt("id"));
-                                //Log.i("id", "###id="+data.getId());
+                                Log.i("id", "###id="+note.getId());
                                 note.setTitle(jsonData.optString("title"));
                                 note.setContent(jsonData.optString("content"));
                                 note.setGroupId(groupId);
@@ -139,10 +177,12 @@ public class FoundFragment extends Fragment {
         queue.add(request);
 
     }
+
     @Override
     public void onResume() {
         super.onResume();
         refreshNoteList();
+
     }
 
     @Override

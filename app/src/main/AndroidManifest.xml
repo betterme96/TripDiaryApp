@@ -28,9 +28,9 @@
             android:screenOrientation="portrait" />
         <activity android:name=".activity.RegisterActivity" />
         <activity android:name=".activity.NewActivity" />
-        <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.MyNoteActivity" />
-        <activity android:name=".activity.OtherActivity"></activity>
+        <activity android:name=".activity.OtherActivity" />
+        <activity android:name=".activity.MainActivity"></activity>
     </application>
 
 </manifest>

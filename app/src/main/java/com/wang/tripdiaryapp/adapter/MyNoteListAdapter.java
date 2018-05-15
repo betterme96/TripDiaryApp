@@ -91,8 +91,7 @@ public class MyNoteListAdapter extends RecyclerView.Adapter<MyNoteListAdapter.Vi
         holder.tv_list_title.setText(note.getTitle());
         holder.tv_list_summary.setText(note.getContent());
         holder.tv_list_time.setText(note.getCreateTime());
-        //holder.tv_list_group.setText(note.getGroupName());
-         holder.tv_list_author.setText(note.getAuthor());
+        holder.tv_list_author.setText(note.getAuthor());
     }
 
     @Override
@@ -109,7 +108,6 @@ public class MyNoteListAdapter extends RecyclerView.Adapter<MyNoteListAdapter.Vi
         public TextView tv_list_title;//日记标题
         public TextView tv_list_summary;//日记摘要
         public TextView tv_list_time;//创建时间
-        public TextView tv_list_group;//笔记分类
         public TextView tv_list_author;//日记作者
         public CardView card_view_note;
 
@@ -120,7 +118,6 @@ public class MyNoteListAdapter extends RecyclerView.Adapter<MyNoteListAdapter.Vi
             tv_list_summary = (TextView) view.findViewById(R.id.tv_list_summary);
             tv_list_time = (TextView) view.findViewById(R.id.tv_list_time);
             tv_list_author = (TextView)view.findViewById(R.id.tv_list_author);
-            //tv_list_group = (TextView) view.findViewById(R.id.tv_list_group);
         }
     }
 }

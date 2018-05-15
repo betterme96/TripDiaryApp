@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -28,6 +30,7 @@ import com.wang.tripdiaryapp.bean.Group;
 import com.wang.tripdiaryapp.bean.Note;
 import com.wang.tripdiaryapp.db.GroupDao;
 import com.wang.tripdiaryapp.db.NoteDao;
+import com.wang.tripdiaryapp.fragment.MyFragment;
 import com.wang.tripdiaryapp.util.CommonUtil;
 import com.wang.tripdiaryapp.util.ImageUtils;
 import com.wang.tripdiaryapp.util.StringUtils;
@@ -62,9 +65,9 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
 
     private NoteDao noteDao;
     private Note note;//笔记对象
+    private int myId;
     private String myTitle;
     private String myContent;
-    private String myGroupName;
     private String myNoteTime;
     private int flag;//区分是新建笔记还是编辑笔记
 
@@ -111,7 +114,6 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
         });
 
 
-        noteDao = new NoteDao(this);
         note = new Note();
 
         screenWidth = CommonUtil.getScreenWidth(this);
@@ -124,7 +126,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
         et_new_title = (EditText) findViewById(R.id.et_new_title);
         et_new_content = (RichTextEditor) findViewById(R.id.et_new_content);
         tv_new_time = (TextView) findViewById(R.id.tv_new_time);
-
+        tv_new_author=(TextView)findViewById(R.id.tv_new_author);
 
         Intent intent = getIntent();
         flag = intent.getIntExtra("flag", 0);//0新建，1编辑
@@ -132,6 +134,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
             Bundle bundle = intent.getBundleExtra("data");
             note = (Note) bundle.getSerializable("note");
 
+            myId = note.getId();
             myTitle = note.getTitle();
             myContent = note.getContent();
             myNoteTime = note.getCreateTime();
@@ -143,7 +146,8 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
             loadingDialog.show();
 
             setTitle("编辑笔记");
-            tv_new_time.setText(note.getCreateTime());
+            myNoteTime = CommonUtil.date2string(new Date());
+            tv_new_time.setText(myNoteTime);
             et_new_title.setText(note.getTitle());
             et_new_content.post(new Runnable() {
                 @Override
@@ -155,7 +159,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
             });
         } else {
             setTitle("新建笔记");
-           // tv_new_author.setText(LoginActivity.usernameStr);
+            tv_new_author.setText(LoginActivity.usernameStr);
             myNoteTime = CommonUtil.date2string(new Date());
             tv_new_time.setText(myNoteTime);
         }
@@ -252,9 +256,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
         String d_author = LoginActivity.usernameStr;
 
         String d_date = tv_new_time.getText().toString();
-        Toast.makeText(NewActivity.this, d_date, Toast.LENGTH_SHORT).show();
-
-        if (d_title.length() == 0 ){//如果标题为空，则截取内容为标题
+               if (d_title.length() == 0 ){//如果标题为空，则截取内容为标题
              if (d_content.length() > cutTitleLength){
                  d_title = d_content.substring(0,cutTitleLength);
              } else if (d_content.length() > 0 && d_content.length() <= cutTitleLength){
@@ -276,15 +278,12 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                 uploadNote(d_title,d_author,d_content,d_date);
                 flag = 1;//插入以后只能是编辑
                 if (!isBackground){
-                    Intent intent = new Intent();
-                    setResult(RESULT_OK, intent);
                     finish();
                 }
             }
         }else if (flag == 1) {//编辑笔记
             if (!d_title.equals(myTitle) ||!d_content.equals(myContent) || !d_date.equals(myNoteTime)) {
-                updateNote(myTitle,d_title,d_content);
-
+                updateNote(myId,d_title,d_content,d_date);
             }
             if (!isBackground) {
                 finish();
@@ -367,7 +366,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                         uploadImage(imagePath);
                         //上传到服务器之后的图片路径
                         //imagePath=IMG_URL+"/"+ UploadUtil.getFileName(imagePath)+".png";
-                        Log.i("NewActivity", "###path=" + imagePath);
+                        //Log.i("NewActivity", "###path=" + imagePath);
                         subscriber.onNext(imagePath);
                     }
                     //subscriber.onNext("http://p695w3yko.bkt.clouddn.com/18-5-5/30271511.jpg");
@@ -462,14 +461,16 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
     /**
      * 更新笔记到服务器
      */
-    public void updateNote(String d_title,String d_title_new,String d_content){
+    public void updateNote(int id,String d_title,String d_content,String d_date){
         //volley请求，将数据存到服务器
         String url = "http://xixixi.pythonanywhere.com/tripdiary/updatediary";
+        String d_id = String.valueOf(id);
         RequestQueue queue = Volley.newRequestQueue(this);
         Map<String,String> map = new HashMap<>();
+        map.put("d_id",d_id);
         map.put("d_title",d_title);
-        map.put("d_title_new",d_title_new);
         map.put("d_content",d_content);
+        map.put("d_date",d_date);
         map.put("Content-type","application/json;charset=utf-8");
         JSONObject paramJsonObject = new JSONObject(map);
         JsonObjectRequest jsonrequest = new JsonObjectRequest(Request.Method.POST, url, paramJsonObject,

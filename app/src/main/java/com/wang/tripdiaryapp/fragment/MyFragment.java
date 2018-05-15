@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,7 +98,7 @@ public class MyFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                        // int ret = noteDao.deleteNote(note.getId());
-                        deleteNote(note.getTitle());
+                        deleteNote(note.getId());
                         refreshNoteList();
                         /*if (ret > 0){
                             Toast.makeText(getActivity(), "删除成功", Toast.LENGTH_SHORT).show();
@@ -127,16 +128,16 @@ public class MyFragment extends Fragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        if(response!=null&&response.length()>0){
+                        if(response!=null&&response.length()>0) {
                             JSONArray diary = response.optJSONArray("diary");
                             String dataString = diary.toString();
-
-                            for(int i=0;i<diary.length();i++){
+                            for (int i = 0; i < diary.length(); i++) {
                                 JSONObject jsonData = diary.optJSONObject(i);
                                 Note data = new Note();
                                 data.setId(jsonData.optInt("id"));
-                                //Log.i("id", "###id="+data.getId());
+                                //Log.i("myfragment", "###id="+data.getId());
                                 data.setTitle(jsonData.optString("title"));
+                               // Log.i("myfragment", "###id="+data.getTitle());
                                 data.setContent(jsonData.optString("content"));
                                 data.setGroupId(groupId);
                                 data.setGroupName(groupName);
@@ -162,12 +163,12 @@ public class MyFragment extends Fragment {
         queue.add(request);
     }
     //删除笔记
-    private void deleteNote(String title){
+    private void deleteNote(int d_id){
         String url = "http://xixixi.pythonanywhere.com/tripdiary/deletediary";
-
+        String id = String.valueOf(d_id);
         RequestQueue queue = Volley.newRequestQueue(getActivity());
         Map<String,String> map = new HashMap<>();
-        map.put("title",title);
+        map.put("id",id);
         map.put("Content-type","application/json;charset=utf-8");
         JSONObject paramJsonObject = new JSONObject(map);
         JsonObjectRequest jsonrequest = new JsonObjectRequest(Request.Method.POST, url, paramJsonObject,
