@@ -63,7 +63,6 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
     private TextView tv_new_time;
     private TextView tv_new_author;
 
-    private NoteDao noteDao;
     private Note note;//笔记对象
     private int myId;
     private String myTitle;
@@ -358,7 +357,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                     ArrayList<String> photos = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
                     //可以同时插入多张图片
                     for (String imagePath : photos) {
-                        Log.i("NewActivity", "###imagePath="+imagePath);
+                        //Log.i("NewActivity", "###imagePath="+imagePath);
                         Bitmap bitmap = ImageUtils.getSmallBitmap(imagePath, width, height);//压缩图片
                         imagePath = UploadUtil.saveToSdCard(bitmap);//获得压缩之后的图片存储路径
 

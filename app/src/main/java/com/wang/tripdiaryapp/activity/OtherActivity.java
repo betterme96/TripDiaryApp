@@ -37,7 +37,7 @@ public class OtherActivity extends  BaseActivity {
     private TextView tv_note_title;//笔记标题
     private RichTextView tv_note_content;//笔记内容
     private TextView tv_note_time;//笔记创建时间
-    private TextView tv_note_group;//选择笔记分类
+    private TextView tv_note_author;//笔记作者
     //private ScrollView scroll_view;
     private Note note;//笔记对象
     private String myTitle;
@@ -88,6 +88,7 @@ public class OtherActivity extends  BaseActivity {
         tv_note_title.setTextIsSelectable(true);
         tv_note_content = (RichTextView) findViewById(R.id.tv_note_content);//内容
         tv_note_time = (TextView) findViewById(R.id.tv_note_time);
+        tv_note_author=(TextView)findViewById(R.id.tv_note_author);
 
 
         Intent intent = getIntent();
@@ -108,7 +109,7 @@ public class OtherActivity extends  BaseActivity {
             }
         });
         tv_note_time.setText(note.getCreateTime());
-
+        tv_note_author.setText("作者："+note.getAuthor());
         setTitle("日记详情");
 
     }

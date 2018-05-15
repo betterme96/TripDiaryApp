@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -12,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,6 +62,26 @@ public class FoundFragment extends Fragment {
     private int groupId =0;//分类ID
     private String groupName ="默认笔记";
     private  View view;
+
+    private Handler handler = new Handler()
+    {
+        public void handleMessage(Message msg)
+        {
+            switch (msg.what)
+            {
+                case 123:
+                    mNoteListAdapter = new MyNoteListAdapter();
+                    rv_list_main.setAdapter(mNoteListAdapter);
+                    mNoteListAdapter.setmNotes(noteList);
+                    for(int i = 0; i < noteList.size(); i++)
+                    {
+                        Note information = noteList.get(i);
+                        nameList.add(information.getTitle());
+                    }
+                    break;
+            }
+        }
+    };
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,
                              Bundle savedInstanceState){
@@ -74,6 +96,8 @@ public class FoundFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         initListener();
     }
+
+    //下拉刷新
     private void initListener() {
         //下拉刷新
         mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipelayout);
@@ -105,6 +129,93 @@ public class FoundFragment extends Fragment {
         rv_list_main = view.findViewById(R.id.rv_list_main);
         searchView = view.findViewById(R.id.searchEdit);
         rv_list_main.addItemDecoration(new SpacesItemDecoration(0));//设置item间距
+
+        findList = new ArrayList<Note>();
+        nameList = new ArrayList<String>();
+
+        /**
+         * 默认情况下是没提交搜索的按钮，所以用户必须在键盘上按下"enter"键来提交搜索.你可以同过setSubmitButtonEnabled(
+         * true)来添加一个提交按钮（"submit" button)
+         * 设置true后，右边会出现一个箭头按钮。如果用户没有输入，就不会触发提交（submit）事件
+         */
+        searchView.setSubmitButtonEnabled(true);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            //输入完成后，提交时触发的方法，一般情况是点击输入法中的搜索按钮才会触发，表示现在正式提交了
+            public boolean onQueryTextSubmit(String query) {
+
+                if(TextUtils.isEmpty(query))
+                {
+                    Toast.makeText(getActivity(), "请输入查找内容！", Toast.LENGTH_SHORT).show();
+                    rv_list_main.setAdapter(mNoteListAdapter);
+                }
+                else
+                {
+                    findList.clear();
+                    for(int i = 0; i < noteList.size(); i++)
+                    {
+                        Note information = noteList.get(i);
+                        if(information.getTitle().contains(query)||information.getContent().contains(query))
+                        {
+                            findList.add(information);
+                        }
+                    }
+                    if(findList.size() == 0)
+                    {
+                        Toast.makeText(getActivity(), "查找的日记不在列表中", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        Log.i("NewActivity", "###length="+findList.size());
+                        Toast.makeText(getActivity(), "查找成功", Toast.LENGTH_SHORT).show();
+                        findListAdapter = new MyNoteListAdapter();
+                        rv_list_main.setAdapter(findListAdapter);
+                        findListAdapter.setmNotes(findList);
+                        findListAdapter.notifyDataSetChanged();
+                        findListAdapter.setOnItemClickListener(new MyNoteListAdapter.OnRecyclerViewItemClickListener() {
+                            @Override
+                            public void onItemClick(View view, Note note) {
+                                Toast.makeText(getActivity().getApplicationContext(), note.getTitle(),
+                                        Toast.LENGTH_LONG).show();
+                                Intent intent = new Intent(getActivity(), OtherActivity.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putSerializable("note", note);
+                                intent.putExtra("data", bundle);
+                                startActivity(intent);
+                            }
+                        });
+                    }
+                }
+                return true;
+            }
+
+            //在输入时触发的方法，当字符真正显示到searchView中才触发，像是拼音，在输入法组词的时候不会触发
+            public boolean onQueryTextChange(String newText)
+            {
+
+                if(TextUtils.isEmpty(newText))
+                {
+                    rv_list_main.setAdapter(mNoteListAdapter);
+                }
+                else
+                {
+                    findList.clear();
+                    for(int i = 0; i < noteList.size(); i++)
+                    {
+                        Note information = noteList.get(i);
+                        if(information.getTitle().contains(newText))
+                        {
+                            findList.add(information);
+                        }
+                    }
+                    findListAdapter = new MyNoteListAdapter();
+                    findListAdapter.notifyDataSetChanged();
+                    rv_list_main.setAdapter(findListAdapter);
+                    findListAdapter.setmNotes(findList);
+                }
+                return true;
+            }
+        });
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);//竖向列表
