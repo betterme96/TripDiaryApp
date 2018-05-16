@@ -15,10 +15,9 @@ import android.widget.TextView;
 
 import com.sendtion.xrichtext.RichTextView;
 import com.wang.tripdiaryapp.R;
-import com.wang.tripdiaryapp.bean.Group;
+
 import com.wang.tripdiaryapp.bean.Note;
-import com.wang.tripdiaryapp.db.GroupDao;
-import com.wang.tripdiaryapp.db.NoteDao;
+
 import com.wang.tripdiaryapp.util.CommonUtil;
 import com.wang.tripdiaryapp.util.StringUtils;
 
@@ -32,8 +31,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class OtherActivity extends  BaseActivity {
-    private static final String TAG = "NoteActivity";
-
+    private static final String TAG = "OtherActivity";
     private TextView tv_note_title;//笔记标题
     private RichTextView tv_note_content;//笔记内容
     private TextView tv_note_time;//笔记创建时间
@@ -42,6 +40,7 @@ public class OtherActivity extends  BaseActivity {
     private Note note;//笔记对象
     private String myTitle;
     private String myContent;
+    private int myId;
 
 
     private ProgressDialog loadingDialog;
@@ -95,9 +94,9 @@ public class OtherActivity extends  BaseActivity {
         Bundle bundle = intent.getBundleExtra("data");
         note = (Note) bundle.getSerializable("note");
 
+        myId = note.getId();
         myTitle = note.getTitle();
         myContent = note.getContent();
-
 
         tv_note_title.setText(myTitle);
         tv_note_content.post(new Runnable() {
@@ -188,12 +187,9 @@ public class OtherActivity extends  BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_note_credit://评论笔记
-                Intent intent = new Intent(OtherActivity.this, NewActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("note", note);
-                intent.putExtra("data", bundle);
+                Intent intent = new Intent(OtherActivity.this, CreditActivity.class);
+                intent.putExtra("note_id",myId);
                 startActivity(intent);
-                finish();
                 break;
             case R.id.action_note_share://分享笔记
                 CommonUtil.shareTextAndImage(this, note.getTitle(), note.getContent(), null);//分享图文

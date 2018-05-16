@@ -29,7 +29,7 @@ import com.wang.tripdiaryapp.activity.NewActivity;
 import com.wang.tripdiaryapp.activity.OtherActivity;
 import com.wang.tripdiaryapp.adapter.MyNoteListAdapter;
 import com.wang.tripdiaryapp.bean.Note;
-import com.wang.tripdiaryapp.db.NoteDao;
+
 import com.wang.tripdiaryapp.view.SpacesItemDecoration;
 
 import org.json.JSONArray;
@@ -45,7 +45,6 @@ public class MyFragment extends Fragment {
     private RecyclerView rv_list_main;
     private MyNoteListAdapter mNoteListAdapter;
     private List<Note> noteList;
-    private NoteDao noteDao;
     private int groupId;//分类ID
     private String groupName;
     private  View view;
@@ -59,7 +58,7 @@ public class MyFragment extends Fragment {
     }
 
     private void initView() {
-        noteDao = new NoteDao(getActivity());
+
         rv_list_main = view.findViewById(R.id.rv_list_main);
 
         rv_list_main.addItemDecoration(new SpacesItemDecoration(0));//设置item间距
@@ -115,7 +114,7 @@ public class MyFragment extends Fragment {
     }
     //刷新笔记列表
     private void refreshNoteList(){
-        noteList = noteDao.queryNotesAll(groupId);
+
         noteList = new ArrayList<>();
         String url = "http://xixixi.pythonanywhere.com/tripdiary/userdiary";
         RequestQueue queue = Volley.newRequestQueue(getActivity());
@@ -133,21 +132,18 @@ public class MyFragment extends Fragment {
                             String dataString = diary.toString();
                             for (int i = 0; i < diary.length(); i++) {
                                 JSONObject jsonData = diary.optJSONObject(i);
-                                Note data = new Note();
-                                data.setId(jsonData.optInt("id"));
+                                Note note = new Note();
+                                note.setId(jsonData.optInt("id"));
                                 //Log.i("myfragment", "###id="+data.getId());
-                                data.setTitle(jsonData.optString("title"));
+                                note.setTitle(jsonData.optString("title"));
                                // Log.i("myfragment", "###id="+data.getTitle());
-                                data.setContent(jsonData.optString("content"));
-                                data.setGroupId(groupId);
-                                data.setGroupName(groupName);
-                                data.setType(2);
-                                data.setBgColor("#FFFFFF");
-                                data.setIsEncrypt(0);
-                                data.setCreateTime(jsonData.optString("date"));
-                                data.setUpdateTime(jsonData.optString("date"));
-                                data.setAuthor(jsonData.optString("author"));
-                                noteList.add(data);
+                                note.setContent(jsonData.optString("content"));
+                                note.setType(2);
+                                note.setBgColor("#FFFFFF");
+                                note.setIsEncrypt(0);
+                                note.setCreateTime(jsonData.optString("date"));
+                                note.setAuthor(jsonData.optString("author"));
+                                noteList.add(note);
                             }
                             mNoteListAdapter.setmNotes(noteList);
                             mNoteListAdapter.notifyDataSetChanged();

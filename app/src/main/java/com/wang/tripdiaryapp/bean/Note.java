@@ -15,8 +15,7 @@ public class Note implements Serializable {
     private String title;//笔记标题
     private String content;//笔记内容
     private String author;//笔记作者
-    private int groupId;//分类ID
-    private String groupName;//分类名称
+
     private int type;//笔记类型，1纯文本，2Html，3Markdown
     private String bgColor;//背景颜色，存储颜色代码
     private int isEncrypt ;//是否加密，0未加密，1加密
@@ -54,21 +53,6 @@ public class Note implements Serializable {
         this.content = content;
     }
 
-    public int getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
-    }
-
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
 
     public int getType() {
         return type;

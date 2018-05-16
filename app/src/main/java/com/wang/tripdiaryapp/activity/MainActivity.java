@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.action_account:
                 intent = new Intent(MainActivity.this, LoginActivity.class);
+                intent.putExtra("flag", 1);
                 startActivity(intent);
                 break;
         }

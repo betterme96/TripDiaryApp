@@ -26,11 +26,8 @@ import com.android.volley.toolbox.Volley;
 import com.hdl.myhttputils.MyHttpUtils;
 import com.hdl.myhttputils.bean.CommCallback;
 import com.sendtion.xrichtext.RichTextEditor;
-import com.wang.tripdiaryapp.bean.Group;
+
 import com.wang.tripdiaryapp.bean.Note;
-import com.wang.tripdiaryapp.db.GroupDao;
-import com.wang.tripdiaryapp.db.NoteDao;
-import com.wang.tripdiaryapp.fragment.MyFragment;
 import com.wang.tripdiaryapp.util.CommonUtil;
 import com.wang.tripdiaryapp.util.ImageUtils;
 import com.wang.tripdiaryapp.util.StringUtils;

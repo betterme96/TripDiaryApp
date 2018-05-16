@@ -15,10 +15,7 @@ import android.widget.TextView;
 
 import com.sendtion.xrichtext.RichTextView;
 import com.wang.tripdiaryapp.R;
-import com.wang.tripdiaryapp.bean.Group;
 import com.wang.tripdiaryapp.bean.Note;
-import com.wang.tripdiaryapp.db.GroupDao;
-import com.wang.tripdiaryapp.db.NoteDao;
 import com.wang.tripdiaryapp.util.CommonUtil;
 import com.wang.tripdiaryapp.util.StringUtils;
 

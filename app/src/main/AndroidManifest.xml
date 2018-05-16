@@ -30,7 +30,8 @@
         <activity android:name=".activity.NewActivity" />
         <activity android:name=".activity.MyNoteActivity" />
         <activity android:name=".activity.OtherActivity" />
-        <activity android:name=".activity.MainActivity"></activity>
+        <activity android:name=".activity.MainActivity" />
+        <activity android:name=".activity.CreditActivity"></activity>
     </application>
 
 </manifest>

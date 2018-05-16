@@ -27,14 +27,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.wang.tripdiaryapp.R;
-import com.wang.tripdiaryapp.activity.LoginActivity;
-import com.wang.tripdiaryapp.activity.MainActivity;
-import com.wang.tripdiaryapp.activity.MyNoteActivity;
-import com.wang.tripdiaryapp.activity.NewActivity;
 import com.wang.tripdiaryapp.activity.OtherActivity;
 import com.wang.tripdiaryapp.adapter.MyNoteListAdapter;
 import com.wang.tripdiaryapp.bean.Note;
-import com.wang.tripdiaryapp.db.NoteDao;
 import com.wang.tripdiaryapp.view.SpacesItemDecoration;
 
 import org.json.JSONArray;
@@ -162,7 +157,7 @@ public class FoundFragment extends Fragment {
                     }
                     if(findList.size() == 0)
                     {
-                        Toast.makeText(getActivity(), "查找的日记不在列表中", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "查找的日记不存在", Toast.LENGTH_SHORT).show();
                     }
                     else
                     {
@@ -264,13 +259,10 @@ public class FoundFragment extends Fragment {
                                 Log.i("id", "###id="+note.getId());
                                 note.setTitle(jsonData.optString("title"));
                                 note.setContent(jsonData.optString("content"));
-                                note.setGroupId(groupId);
-                                note.setGroupName(groupName);
                                 note.setType(2);
                                 note.setBgColor("#FFFFFF");
                                 note.setIsEncrypt(0);
                                 note.setCreateTime(jsonData.optString("date"));
-                                note.setUpdateTime(jsonData.optString("date"));
                                 note.setAuthor(jsonData.optString("author"));
                                 noteList.add(note);
                             }

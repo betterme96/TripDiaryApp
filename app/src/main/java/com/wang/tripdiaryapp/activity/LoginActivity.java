@@ -27,6 +27,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText password;
     private Button register;
     private Button login;
+    private int flag;//是否从mainactivity进入
 
     public static String usernameStr,passwordStr;
 
@@ -41,8 +42,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         register.setOnClickListener(this);
         login.setOnClickListener(this);
+        Intent intent = getIntent();
+        flag = intent.getIntExtra("flag", 0);//0新建，1编辑
         Toolbar toolbar = findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
+        if(flag==1){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        }
+
 
     }
 
