@@ -66,7 +66,7 @@ private void register(){
     final String usernameStr = username.getText().toString().trim();
     final String passwordStr = password.getText().toString().trim();
     final String re_passwordStr = repeatpassword.getText().toString().trim();
-    String url = "http://xixixi.pythonanywhere.com/tripdiary/register";//username="+usernameStr+"&password="+passwordStr;
+
     if(TextUtils.isEmpty(usernameStr)){
         Toast.makeText(this,"用户名不能为空",Toast.LENGTH_SHORT).show();
         return;
@@ -79,6 +79,8 @@ private void register(){
         Toast.makeText(this,"密码不一致",Toast.LENGTH_SHORT).show();
         return;
     }
+
+    String url = "http://xixixi.pythonanywhere.com/tripdiary/register";
     RequestQueue queue = Volley.newRequestQueue(this);
     Map<String,String> map = new HashMap<>();
     map.put("username",usernameStr);

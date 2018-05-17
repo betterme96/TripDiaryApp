@@ -88,9 +88,9 @@ public class CreditListAdapter extends RecyclerView.Adapter<CreditListAdapter.Vi
         holder.itemView.setTag(credit);
         //Log.e("adapter", "###record="+record);
         holder.tv_list_content.setMaxLines(50);
-        holder.tv_list_author.setTextSize(22);
+        holder.tv_list_author.setTextSize(20);
         holder.tv_list_author.setText(credit.getAuthor()+":");
-        holder.tv_list_content.setText(credit.getContent()+"\n");
+        holder.tv_list_content.setText(credit.getContent());
         holder.tv_list_time.setText(credit.getCreateTime());
         holder.tv_list_text.setText("评论时间");
     }
