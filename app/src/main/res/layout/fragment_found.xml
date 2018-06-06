@@ -38,8 +38,7 @@
                android:layout_height="match_parent">
               <include layout="@layout/content_main" />
             </android.support.v4.widget.SwipeRefreshLayout>
-
-    </LinearLayout>
+       </LinearLayout>
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton

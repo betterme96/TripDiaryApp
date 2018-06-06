@@ -51,7 +51,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class NewActivity extends BaseActivity implements RichTextEditor.OnDeleteImageListener{
-    private static final String TAG = "NewActivity";
+    private static final String TAG = "WZB";
 
     private static final int REQUEST_CODE_CHOOSE = 23;//定义请求码常量
 
@@ -77,7 +77,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
     private Subscription subsInsert;
 
     private static final String BASE_URL = "http://xixixi.pythonanywhere.com/tripdiary/upload";//文件上传的接口
-    private static final String IMG_URL = "https://www.pythonanywhere.com/user/xixixi/files/home/xixixi/Trip/upload";//文件存放的路径
+    private static final String IMG_URL = "https://www.pythonanywhere.com/user/xixixi/files/home/xixixi/TripDiary/upload/";//文件存放的路径
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -275,6 +275,7 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                 flag = 1;//插入以后只能是编辑
                 if (!isBackground){
                     finish();
+                    Log.d(TAG, "zhixingle");
                 }
             }
         }else if (flag == 1) {//编辑笔记
@@ -357,12 +358,11 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                         //Log.i("NewActivity", "###imagePath="+imagePath);
                         Bitmap bitmap = ImageUtils.getSmallBitmap(imagePath, width, height);//压缩图片
                         imagePath = UploadUtil.saveToSdCard(bitmap);//获得压缩之后的图片存储路径
-
                         //上传图片
                         uploadImage(imagePath);
                         //上传到服务器之后的图片路径
-                        //imagePath=IMG_URL+"/"+ UploadUtil.getFileName(imagePath)+".png";
-                        //Log.i("NewActivity", "###path=" + imagePath);
+                        //imagePath=IMG_URL+ UploadUtil.getFileName(imagePath)+".png";
+                        Log.i("NewActivity", "###path=" + imagePath);
                         subscriber.onNext(imagePath);
                     }
                     //subscriber.onNext("http://p695w3yko.bkt.clouddn.com/18-5-5/30271511.jpg");
@@ -435,7 +435,6 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        //判断状态
                         int status = response.optInt("status");
                         if (status == 200) {
                             Toast.makeText(getApplicationContext(), "保存成功", Toast.LENGTH_SHORT).show();
@@ -473,7 +472,6 @@ public class NewActivity extends BaseActivity implements RichTextEditor.OnDelete
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        //判断注册状态
                         int status = response.optInt("status");
                         if (status == 200) {
                             Toast.makeText(getApplicationContext(), "保存成功", Toast.LENGTH_SHORT).show();

@@ -183,7 +183,6 @@ public class FoundFragment extends Fragment {
                 }
                 return true;
             }
-
             //在输入时触发的方法，当字符真正显示到searchView中才触发，像是拼音，在输入法组词的时候不会触发
             public boolean onQueryTextChange(String newText)
             {
@@ -237,26 +236,23 @@ public class FoundFragment extends Fragment {
     }
     //刷新笔记列表
     private void refreshNoteList(){
-        noteList = new ArrayList<>();
         String url = "http://xixixi.pythonanywhere.com/tripdiary/alldiary";
+
+        noteList = new ArrayList<>();
         RequestQueue queue = Volley.newRequestQueue(getActivity());
         Map<String,String> map = new HashMap<>();
         map.put("Content-type","application/json;charset=utf-8");
         JSONObject paramJsonObject = new JSONObject(map);
-
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, paramJsonObject,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         if(response!=null&&response.length()>0){
                             JSONArray diary = response.optJSONArray("diary");
-                            String dataString = diary.toString();
-
                             for(int i=0;i<diary.length();i++){
                                 JSONObject jsonData = diary.optJSONObject(i);
                                 note = new Note();
                                 note.setId(jsonData.optInt("id"));
-                                Log.i("id", "###id="+note.getId());
                                 note.setTitle(jsonData.optString("title"));
                                 note.setContent(jsonData.optString("content"));
                                 note.setType(2);

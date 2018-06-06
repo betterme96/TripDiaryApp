@@ -159,6 +159,7 @@ public class CreditActivity extends BaseActivity implements View.OnClickListener
             case R.id.send:
                 if(tv_new_credit.getText().length()>0){
                     uploadCredit();
+                    tv_new_credit.getText().clear();
                 }else{
                     toast =Toast.makeText(getApplicationContext(), "评论不能为空", Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
@@ -172,13 +173,14 @@ public class CreditActivity extends BaseActivity implements View.OnClickListener
 
         Intent intent = getIntent();
         id = intent.getIntExtra("note_id",0);
+
+        String url = "http://xixixi.pythonanywhere.com/tripdiary/savecredit";
         //Toast.makeText(getApplicationContext(), String.valueOf(id), Toast.LENGTH_SHORT).show();
         String c_date = CommonUtil.date2string(new Date());
         String c_diary = String.valueOf(id);
         String c_author = LoginActivity.usernameStr;
         String c_content = tv_new_credit.getText().toString();
 
-        String url = "http://xixixi.pythonanywhere.com/tripdiary/savecredit";
         RequestQueue queue = Volley.newRequestQueue(this);
         Map<String,String> map = new HashMap<>();
         map.put("c_date",c_date);

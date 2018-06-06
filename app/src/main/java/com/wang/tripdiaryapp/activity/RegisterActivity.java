@@ -81,12 +81,14 @@ private void register(){
     }
 
     String url = "http://xixixi.pythonanywhere.com/tripdiary/register";
+    //构建一个RequestQueue
     RequestQueue queue = Volley.newRequestQueue(this);
     Map<String,String> map = new HashMap<>();
     map.put("username",usernameStr);
     map.put("password",passwordStr);
     map.put("Content-type","application/json;charset=utf-8");
     JSONObject paramJsonObject = new JSONObject(map);
+    //创建一个JsonObjectRequest
     JsonObjectRequest jsonrequest = new JsonObjectRequest(Request.Method.POST, url, paramJsonObject,
             new Response.Listener<JSONObject>() {
                 @Override
@@ -97,7 +99,7 @@ private void register(){
                         Toast.makeText(getApplicationContext(), "注册成功", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                         startActivity(intent);
-                    } else if (status == 400) {
+                    } else if (status == 500) {
                         Toast.makeText(getApplicationContext(), "注册失败", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -107,8 +109,7 @@ private void register(){
             Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
         }
     });
-
-    //Add the request to the queue
+    //将JsonObjectRequest加入到RequestQueue
     queue.add(jsonrequest);
 }
 }

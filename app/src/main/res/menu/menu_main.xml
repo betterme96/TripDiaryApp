@@ -7,10 +7,12 @@
         android:id="@+id/action_new_note"
         android:orderInCategory="100"
         android:title="新建"
+        android:icon="@mipmap/ic_new"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_account"
-        android:orderInCategory="100"
+        android:icon="@mipmap/ic_my"
+        android:orderInCategory="101"
         android:title="切换"
         app:showAsAction="always" />
 </menu>

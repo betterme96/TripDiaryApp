@@ -8,11 +8,13 @@
         android:id="@+id/action_note_share"
         android:orderInCategory="100"
         android:title="分享"
+        android:icon="@mipmap/ic_share"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_note_edit"
         android:orderInCategory="100"
         android:title="编辑"
+        android:icon="@mipmap/ic_edit"
         app:showAsAction="always" />
 </menu>

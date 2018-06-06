@@ -8,11 +8,13 @@
         android:id="@+id/action_insert_image"
         android:orderInCategory="100"
         android:title="图片"
+        android:icon="@mipmap/ic_picnew"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_new_save"
         android:orderInCategory="100"
         android:title="保存"
+        android:icon="@mipmap/ic_save"
         app:showAsAction="always" />
 </menu>

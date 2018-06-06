@@ -51,7 +51,8 @@
             android:id="@+id/tv_new_credit"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:hint="添加评论……"/>
 
         <ImageButton
             android:id="@+id/send"

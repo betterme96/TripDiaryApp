@@ -97,8 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Toolbar toolbar = findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
-
-
+        setChioceItem(1);
     }
 
     @Override
@@ -156,7 +155,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     // 如果MessageFragment不为空，则直接将它显示出来
                     transaction.show(foundFragment);
-
                 }
                 break;
 

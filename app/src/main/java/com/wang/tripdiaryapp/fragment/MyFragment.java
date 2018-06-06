@@ -114,8 +114,8 @@ public class MyFragment extends Fragment {
     }
     //刷新笔记列表
     private void refreshNoteList(){
-
         noteList = new ArrayList<>();
+        //noteList = null;
         String url = "http://xixixi.pythonanywhere.com/tripdiary/userdiary";
         RequestQueue queue = Volley.newRequestQueue(getActivity());
         Map<String,String> map = new HashMap<>();
